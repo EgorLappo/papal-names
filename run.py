@@ -49,7 +49,7 @@ dn = pd.DataFrame.from_records(rows)
 fig, axs = plt.subplots(
     1, 2, figsize=(10, 4), constrained_layout=True, gridspec_kw={"wspace": 0.1}
 )
-colors = sns.xkcd_palette(["charcoal", "terracotta", "dark green blue"])
+colors = sns.xkcd_palette(["charcoal", "terracotta"])
 
 ax = axs[0]
 sns.lineplot(dc, x="year", y="n", label="Popes", color=colors[0], ax=ax)
@@ -86,7 +86,7 @@ ax.set_yticks([1, 250, 500, 750, 1000, 1250, 1500, 1750, 2000])
 
 
 ax.set_xlim(0, 23)
-ax.set_ylim(-70,2300)
+ax.set_ylim(-70, 2300)
 
 axs[0].text(
     -0.1,
@@ -117,13 +117,13 @@ ax.annotate(
     arrowprops=dict(
         arrowstyle="->",
         connectionstyle="arc3,rad=-0.05",
-        color=colors[2],
+        color=colors[1],
         shrinkA=0.1,
         shrinkB=0.8,
     ),
     va="baseline",
     ha="center",
-    color=colors[2]
+    color=colors[1],
 )
 
 ax.annotate(
@@ -133,61 +133,61 @@ ax.annotate(
     arrowprops=dict(
         arrowstyle="->",
         connectionstyle="arc3,rad=-0.05",
-        color=colors[2],
+        color=colors[1],
         shrinkA=0.1,
         shrinkB=0.8,
     ),
     va="baseline",
     ha="center",
-    color=colors[2],
+    color=colors[1],
 )
 
 ax.annotate(
     "Benedict",
-    (15.2, 2005+33),
-    (16, 2005+150),
+    (15.2, 2005 + 33),
+    (16, 2005 + 150),
     arrowprops=dict(
         arrowstyle="->",
         connectionstyle="arc3,rad=-0.05",
-        color=colors[2],
+        color=colors[1],
         shrinkA=0.1,
         shrinkB=0.8,
     ),
     va="baseline",
     ha="left",
-    color=colors[2],
+    color=colors[1],
 )
 
 ax.annotate(
     "Leo",
-    (13.8, 2025+33),
-    (13, 2025+150),
+    (13.8, 2025 + 33),
+    (13, 2025 + 150),
     arrowprops=dict(
         arrowstyle="->",
         connectionstyle="arc3,rad=-0.05",
-        color=colors[2],
+        color=colors[1],
         shrinkA=0.1,
         shrinkB=0.8,
     ),
     va="baseline",
     ha="right",
-    color=colors[2]
+    color=colors[1],
 )
 
 ax.annotate(
     "Pius",
-    (11.8, 1939+33),
-    (11, 1939+150),
+    (11.8, 1939 + 33),
+    (11, 1939 + 150),
     arrowprops=dict(
         arrowstyle="->",
         connectionstyle="arc3,rad=-0.05",
-        color=colors[2],
+        color=colors[1],
         shrinkA=0.1,
         shrinkB=0.8,
     ),
     va="baseline",
     ha="right",
-    color=colors[2],
+    color=colors[1],
 )
 
 fig.savefig("figures/figure_1.pdf", bbox_inches="tight")
@@ -328,6 +328,7 @@ def get_windows(size):
     x = np.arange(432, 2025 - size + 1)
     return zip(x, x + size)
 
+
 # size of the temporal window
 size = 200
 
@@ -356,9 +357,9 @@ else:
         p_tail = run_test_conditional(
             n, k, end_configuration, initial_configuration, SAMPLES
         )
-        
+
         theta = fit_theta_conditional(n, k, n0, k0)
-        
+
         d_win = popes.query("start >= @s and start < @e")
         k_win = len(d_win["name"].unique())
         n_win = d_win.shape[0]
