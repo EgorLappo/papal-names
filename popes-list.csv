@@ -1,0 +1,266 @@
+pope,name,start
+"Peter",petrvs,30
+"Linus",linvs,64
+"Cletus",cletvs,76
+"Clement I",clemens,88
+"Evaristus",evaristvs,97
+"Alexander I",alexander,105
+"Sixtus I",xystvs,115
+"Telesphorus",telesphorvs,125
+"Hyginus",hyginvs,136
+"Pius I",pivs,140
+"Anicetus",anicetvs,155
+"Soter",soter,166
+"Eleutherius",elevtherius,174
+"Victor I",victor,189
+"Zephyrinus",zephyrinvs,198
+"Callixtus I",callistvs,218
+"Urban I",vrbanvs,222
+"Pontian",pontianvs,230
+"Anterus",antervs,235
+"Fabian",fabianvs,236
+"Cornelius",cornelivs,251
+"Lucius I",lucivs,253
+"Stephen I",stephanvs,254
+"Sixtus II",xystvs,257
+"Dionysius",dionysivs,259
+"Felix I",felix,269
+"Eutychian",evtychianvs,275
+"Caius",caivs,283
+"Marcellinus",marcellinvs,296
+"Marcellus I",marcellvs,308
+"Eusebius",evsebivs,309
+"Miltiades",miltiades,311
+"Sylvester I",silvester,314
+"Mark",marcvs,336
+"Julius I",ivlivs,337
+"Liberius",liberivs,352
+"Damasus I",damasvs,366
+"Siricius",siricivs,384
+"Anastasius I",anastasivs,399
+"Innocent I",innocentivs,401
+"Zosiumus",zosimvs,417
+"Boniface I",bonifativs,418
+"Celestine I",coelestinvs,422
+"Sixtus III",xystvs,432
+"Leo I",leo,440
+"Hilarius",hilarivs,461
+"Simplicius",simplicivs,468
+"Felix III",felix,483
+"Gelasius I",gelasivs,492
+"Anastasius II",anastasivs,496
+"Symmachus",symmachvs,498
+"Hormisdas",hormisdas,514
+"John I",ioannes,523
+"Felix IV",felix,526
+"Boniface II",bonifativs,530
+"John II",ioannes,533
+"Agapetus I",agapitvs,535
+"Silverius",silverivs,536
+"Vigilius",vigilivs,537
+"Pelagius I",pelagivs,556
+"John III",ioannes,561
+"Benedict I",benedictvs,575
+"Pelagius II",pelagivs,579
+"Gregory I",gregorivs,590
+"Sabinian",sabinianvs,604
+"Boniface III",bonifativs,607
+"Boniface IV",bonifativs,608
+"Adeodatus I",adeodatvs,615
+"Boniface V",bonifativs,619
+"Honorius I",honorivs,625
+"Severinus",severinvs,640
+"John IV",ioannes,640
+"Theodore I",theodorvs,642
+"Martin I",martinvs,649
+"Eugene I",evgenivs,654
+"Vitalian",vitalianvs,657
+"Adeodatus II",adeodatvs,672
+"Donus",donvs,676
+"Agatho",agatho,678
+"Leo II",leo,682
+"Benedict II",benedictvs,684
+"John V",ioannes,685
+"Conon",conon,686
+"Sergius I",sergivs,687
+"John VI",ioannes,701
+"John VII",ioannes,705
+"Sisinnius",sisinnivs,708
+"Constantine",constantinvs,708
+"Gregory II",gregorivs,715
+"Gregory III",gregorivs,731
+"Zachary",zacharias,741
+"Stephen II",stephanvs,752
+"Paul I",pavlvs,757
+"Stephen III",stephanvs,768
+"Adrian",hadrianvs,772
+"Leo III",leo,795
+"Stephen IV",stephanvs,816
+"Paschal I",paschalis,817
+"Eugene II",evgenivs,824
+"Valentine",valentinvs,827
+"Gregory IV",gregorivs,827
+"Sergius II",sergivs,844
+"Leo IV",leo,847
+"Benedict III",benedictvs,855
+"Nicholas I",nicolavs,858
+"Adrian II",hadrianvs,867
+"John VIII",ioannes,872
+"Marinus I",marinvs,882
+"Adrian III",hadrianvs,884
+"Stephen V",stephanvs,885
+"Formosus",formosvs,891
+"Boniface VI",bonifativs,896
+"Stephen VI",stephanvs,896
+"Romanus",romanvs,897
+"Theodore II",theodorvs,897
+"John IX",ioannes,898
+"Benedict IV",benedictvs,900
+"Leo V",leo,903
+"Sergius III",sergivs,904
+"Anastasius III",anastasivs,911
+"Lando",landvs,913
+"John X",ioannes,914
+"Leo VI",leo,928
+"Stephen VII",stephanvs,929
+"Jogn XI",ioannes,931
+"Leo VII",leo,936
+"Stephen VIII",stephanvs,939
+"Marinus II",marinvs,942
+"Agapetus II",agapitvs,946
+"John XII",ioannes,955
+"Benedict V",benedictvs,964
+"Leo VIII",leo,964
+"John XIII",ioannes,965
+"Benedict VI",benedictvs,973
+"Benedict VII",benedictvs,974
+"John XIV",ioannes,983
+"John XV",ioannes,985
+"Gregory V",gregorivs,996
+"Sylvester II",silvester,999
+"John XVII",ioannes,1003
+"John XVIII",ioannes,1003
+"Sergius IV",sergivs,1009
+"Benedict VIII",benedictvs,1012
+"John XIX",ioannes,1024
+"Benedict IX",benedictvs,1032
+"Sylvester III",silvester,1045
+"Gregory VI",gregorivs,1045
+"Clement II",clemens,1046
+"Damasus II",damasvs,1048
+"Leo IX",leo,1049
+"Victor II",victor,1055
+"Stephen IX",stephanvs,1057
+"Nicholas II",nicolavs,1058
+"Alexander II",alexander,1061
+"Gregory VII",gregorivs,1073
+"Victor III",victor,1086
+"Urban II",vrbanvs,1088
+"Paschal II",paschalis,1099
+"Gelasius II",gelasivs,1118
+"Callixtus II",callistvs,1119
+"Honorius II",honorivs,1124
+"Innocent II",innocentivs,1130
+"Celestine II",coelestinvs,1143
+"Lucius II",lucivs,1144
+"Eugene III",evgenivs,1145
+"Anastasius IV",anastasivs,1153
+"Adrian IV",hadrianvs,1154
+"Alexander III",alexander,1159
+"Lucius III",lucivs,1181
+"Urban III",vrbanvs,1185
+"Gregory VIII",gregorivs,1187
+"Clement III",clemens,1187
+"Celestine III",coelestinvs,1191
+"Innocent III",innocentivs,1198
+"Honorius III",honorivs,1216
+"Gregory IX",gregorivs,1227
+"Celestine IV",coelestinvs,1241
+"Innocent IV",innocentivs,1243
+"Alexander IV",alexander,1254
+"Urban IV",vrbanvs,1261
+"Clement IV",clemens,1265
+"Gregory X",gregorivs,1271
+"Innocent V",innocentivs,1276
+"Adrian V",hadrianvs,1276
+"John XXI",ioannes,1277
+"Nicholas III",nicolavs,1277
+"Martin IV",martinvs,1281
+"Honorius IV",honorivs,1285
+"Nicholas IV",nicolavs,1288
+"Celestine V",coelestinvs,1294
+"Boniface VIII",bonifativs,1294
+"Benedict XI",benedictvs,1303
+"Clement V",clemens,1305
+"John XXII",ioannes,1316
+"Benedict XII",benedictvs,1334
+"Clement VI",clemens,1342
+"Innocent VI",innocentivs,1352
+"Urban V",vrbanvs,1362
+"Gregory XI",gregorivs,1370
+"Urban VI",vrbanvs,1378
+"Boniface IX",bonifativs,1389
+"Innocent VII",innocentivs,1404
+"Gregory XII",gregorivs,1406
+"Martin V",martinvs,1417
+"Eugene IV",evgenivs,1431
+"Nicholas V",nicolavs,1447
+"Callixtus III",callistvs,1455
+"Pius II",pivs,1458
+"Paul II",pavlvs,1464
+"Sixtus IV",xystvs,1471
+"Innocent VIII",innocentivs,1484
+"Alexander VI",alexander,1492
+"Pius III",pivs,1503
+"Julius II",ivlivs,1503
+"Leo X",leo,1513
+"Adrian VI",hadrianvs,1522
+"Clement VII",clemens,1523
+"Paul III",pavlvs,1534
+"Julius III",ivlivs,1550
+"Marcellus II",marcellvs,1555
+"Paul IV",pavlvs,1555
+"Pius IV",pivs,1559
+"Pius V",pivs,1566
+"Gregory XIII",gregorivs,1572
+"Sixtus V",xystvs,1585
+"Urban VII",vrbanvs,1590
+"Gregory XIV",gregorivs,1590
+"Innocent IX",innocentivs,1591
+"Clement VIII",clemens,1592
+"Leo XI",leo,1605
+"Paul V",pavlvs,1605
+"Gregory XV",gregorivs,1621
+"Urban VIII",vrbanvs,1623
+"Innocent X",innocentivs,1644
+"Alexander VII",alexander,1655
+"Clement IX",clemens,1667
+"Clement X",clemens,1670
+"Innocent XI",innocentivs,1676
+"Alexander VIII",alexander,1689
+"Innocent XII",innocentivs,1691
+"Clement XI",clemens,1700
+"Innocent XIII",innocentivs,1721
+"Benedict XIII",benedictvs,1724
+"Clement XII",clemens,1730
+"Benedict XIV",benedictvs,1740
+"Clement XIII",clemens,1758
+"Clement XIV",clemens,1769
+"Pius VI",pivs,1775
+"Pius VII",pivs,1800
+"Leo XII",leo,1823
+"Pius VIII",pivs,1829
+"Gregory XVI",gregorivs,1831
+"Pius IX",pivs,1846
+"Leo XIII",leo,1878
+"Pius X",pivs,1903
+"Benedict XV",benedictvs,1914
+"Pius XI",pivs,1922
+"Pius XII",pivs,1939
+"John XXIII",ioannes,1958
+"Paul VI",pavlvs,1963
+"John Paul I","ioannes pavlvs",1978
+"John Paul II","ioannes pavlvs",1978
+"Benedict XVI",benedictvs,2005
+"Francis",franciscvs,2013
+"Leo XIV",leo,2025
