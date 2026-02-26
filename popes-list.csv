@@ -1,18 +1,18 @@
 pope,name,start
 "Peter",petrvs,30
-"Linus",linvs,64
-"Cletus",cletvs,76
-"Clement I",clemens,88
-"Evaristus",evaristvs,97
-"Alexander I",alexander,105
-"Sixtus I",xystvs,115
-"Telesphorus",telesphorvs,125
-"Hyginus",hyginvs,136
-"Pius I",pivs,140
-"Anicetus",anicetvs,155
-"Soter",soter,166
-"Eleutherius",elevtherius,174
-"Victor I",victor,189
+"Linus",linvs,68
+"Cletus",cletvs,80
+"Clement I",clemens,92
+"Evaristus",evaristvs,99
+"Alexander I",alexander,108
+"Sixtus I",xystvs,117
+"Telesphorus",telesphorvs,127
+"Hyginus",hyginvs,138
+"Pius I",pivs,142
+"Anicetus",anicetvs,150
+"Soter",soter,162
+"Eleutherius",elevtherius,171
+"Victor I",victor,186
 "Zephyrinus",zephyrinvs,198
 "Callixtus I",callistvs,218
 "Urban I",vrbanvs,222
@@ -28,7 +28,7 @@ pope,name,start
 "Eutychian",evtychianvs,275
 "Caius",caivs,283
 "Marcellinus",marcellinvs,296
-"Marcellus I",marcellvs,308
+"Marcellus I",marcellvs,306
 "Eusebius",evsebivs,309
 "Miltiades",miltiades,311
 "Sylvester I",silvester,314
@@ -54,7 +54,7 @@ pope,name,start
 "John I",ioannes,523
 "Felix IV",felix,526
 "Boniface II",bonifativs,530
-"John II",ioannes,533
+"John II",ioannes,532
 "Agapetus I",agapitvs,535
 "Silverius",silverivs,536
 "Vigilius",vigilivs,537
@@ -69,7 +69,7 @@ pope,name,start
 "Adeodatus I",adeodatvs,615
 "Boniface V",bonifativs,619
 "Honorius I",honorivs,625
-"Severinus",severinvs,640
+"Severinus",severinvs,638
 "John IV",ioannes,640
 "Theodore I",theodorvs,642
 "Martin I",martinvs,649
@@ -78,7 +78,7 @@ pope,name,start
 "Adeodatus II",adeodatvs,672
 "Donus",donvs,676
 "Agatho",agatho,678
-"Leo II",leo,682
+"Leo II",leo,681
 "Benedict II",benedictvs,684
 "John V",ioannes,685
 "Conon",conon,686
@@ -132,7 +132,7 @@ pope,name,start
 "Benedict V",benedictvs,964
 "Leo VIII",leo,964
 "John XIII",ioannes,965
-"Benedict VI",benedictvs,973
+"Benedict VI",benedictvs,972
 "Benedict VII",benedictvs,974
 "John XIV",ioannes,983
 "John XV",ioannes,985

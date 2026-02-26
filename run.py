@@ -257,7 +257,7 @@ colors = sns.xkcd_palette(["slate blue", "teal green"])
 sns.lineplot(ps, x="year", y="p_tail", ax=axs[0], color=colors[0])
 
 axs[0].set_xlabel("Year")
-axs[0].set_ylabel("$P_E$, Ewens exact test tail probability")
+axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability")
 
 axs[0].axhline(1, color="gray", linestyle="--")
 axs[0].axhline(0.05, color="red")
@@ -406,7 +406,7 @@ dplot = ps_windowed.query(f"window_size == @size")
 sns.lineplot(dplot, x="window_end", y="p_tail", ax=axs[0], color=colors[0])
 
 axs[0].set_xlabel("Year")
-axs[0].set_ylabel("$P_E$, Ewens exact test tail probability")
+axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability")
 
 axs[0].axhline(1, color="gray", linestyle="--")
 axs[0].axhline(0.05, color="red")
