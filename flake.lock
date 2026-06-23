@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "ewens-configurations": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1782182672,
+        "narHash": "sha256-vvyxeZwljz1z9VZiKqx90Uvbc3fEeJ/I1T4tdVr+Bh0=",
+        "owner": "EgorLappo",
+        "repo": "ewens-configurations",
+        "rev": "1f99e8bddda649c706b8d090a3e8c7a8b02f3371",
+        "type": "github"
+      },
+      "original": {
+        "owner": "EgorLappo",
+        "ref": "main",
+        "repo": "ewens-configurations",
+        "type": "github"
+      }
+    },
     "ewens-sampler": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -9,11 +26,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770510841,
-        "narHash": "sha256-wbso4zIfeJ3ZiPK2lEo634JoiBPnkHYA97A5UbOZMV0=",
+        "lastModified": 1780494127,
+        "narHash": "sha256-GgxeTRRTzL290Dt6O7Z6m+0gvi9UCDpMN+NFlTUk63I=",
         "owner": "EgorLappo",
         "repo": "ewens-sampler",
-        "rev": "b3819c96db3489c810595cd91deb8aa3391f83c9",
+        "rev": "6d34c20ffe5e107b0244765424d5796cd7d5484e",
         "type": "github"
       },
       "original": {
@@ -90,11 +107,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1768908532,
-        "narHash": "sha256-HIdLXEFaUVE8FiaCPJbCfBMsnF+mVtDub8Jwj2BD+mk=",
+        "lastModified": 1778151388,
+        "narHash": "sha256-lldMJPUeouEjO8/7aLuwhcsIw29vVihm2ZALzjiqfec=",
         "owner": "nix-community",
         "repo": "naersk",
-        "rev": "8d97452673640eb7fabe428e8b6a425bc355008b",
+        "rev": "efdddff9ff4d8e7d0056d57ec67dac50f75ab8f6",
         "type": "github"
       },
       "original": {
@@ -105,11 +122,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1770380644,
-        "narHash": "sha256-P7dWMHRUWG5m4G+06jDyThXO7kwSk46C1kgjEWcybkE=",
+        "lastModified": 1780365719,
+        "narHash": "sha256-QfWfccTN+70ZQ4m2qlU9PiKfz2Yppq94058iJyARNwc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ae67888ff7ef9dff69b3cf0cc0fbfbcd3a722abe",
+        "rev": "ffa10e26ae11d676b2db836259889f1f571cb14f",
         "type": "github"
       },
       "original": {
@@ -121,6 +138,7 @@
     },
     "root": {
       "inputs": {
+        "ewens-configurations": "ewens-configurations",
         "ewens-sampler": "ewens-sampler",
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs"

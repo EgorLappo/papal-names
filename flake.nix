@@ -8,6 +8,10 @@
       url = "github:EgorLappo/ewens-sampler";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    ewens-configurations = {
+      url = "github:EgorLappo/ewens-configurations/main"; # Replace with your target repo and branch/commit
+      flake = false;
+    };
   };
 
   outputs =
@@ -16,6 +20,8 @@
       nixpkgs,
       flake-utils,
       ewens-sampler,
+      ewens-configurations,
+      ...
     }:
 
     flake-utils.lib.eachDefaultSystem (
@@ -26,8 +32,11 @@
         python-env = pkgs.python3.withPackages (
           ps: with ps; [
             tqdm
+            joblib
             numpy
             pandas
+            polars
+            pyarrow
             scipy
             matplotlib
             seaborn
@@ -36,6 +45,7 @@
         );
 
         es = ewens-sampler.defaultPackage.${system};
+        ec = pkgs.callPackage ewens-configurations { };
 
       in
       {
@@ -52,6 +62,8 @@
 
               # sampler
               es
+              # enumerator
+              ec
             ];
 
             shellHook = ''
