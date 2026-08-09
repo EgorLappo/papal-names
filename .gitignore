@@ -1,4 +1,6 @@
 notebooks/output/
+data/figure_s1a.csv
+data/figure_s1b.csv
 
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python

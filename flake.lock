@@ -26,11 +26,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780494127,
-        "narHash": "sha256-GgxeTRRTzL290Dt6O7Z6m+0gvi9UCDpMN+NFlTUk63I=",
+        "lastModified": 1785907504,
+        "narHash": "sha256-9aT7f9nS0E1xUvHB5zzcPY4VM8+eFOnLv7okzEW7jMg=",
         "owner": "EgorLappo",
         "repo": "ewens-sampler",
-        "rev": "6d34c20ffe5e107b0244765424d5796cd7d5484e",
+        "rev": "689c13341123b8f383c55104695cb753639c750f",
         "type": "github"
       },
       "original": {
@@ -122,11 +122,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1780365719,
-        "narHash": "sha256-QfWfccTN+70ZQ4m2qlU9PiKfz2Yppq94058iJyARNwc=",
+        "lastModified": 1785747939,
+        "narHash": "sha256-D740uKsMbgsfK2oaDenJLLPIZfq7W0/g4KN/Fls8eKs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ffa10e26ae11d676b2db836259889f1f571cb14f",
+        "rev": "104240a772428cc2e20d8fd86c9ddbb886bbaff2",
         "type": "github"
       },
       "original": {

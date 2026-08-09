@@ -9,7 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ewens-configurations = {
-      url = "github:EgorLappo/ewens-configurations/main"; # Replace with your target repo and branch/commit
+      url = "github:EgorLappo/ewens-configurations/main";
       flake = false;
     };
   };
@@ -56,6 +56,9 @@
             buildInputs = [
               # automation
               just
+
+              # formatter
+              ruff
 
               # environments
               python-env

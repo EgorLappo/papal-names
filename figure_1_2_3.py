@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import random
+import json
 import subprocess as sbp
 import pandas as pd
 import numpy as np
@@ -196,35 +197,16 @@ fig.savefig("figures/figure_1.png", dpi=600, bbox_inches="tight")
 
 # make figure 2
 
-
-def run_test(n, k, configuration, samples=1e8):
-    seed = random.randint(0, 2**16)
-
-    cmd = f"ewens-sampler sample --seed {seed} -n {n} -k {k} {int(samples)} | ewens-sampler test '{configuration}'"
-
-    result = sbp.getoutput(cmd).split()
-    count, total = int(result[0]), int(result[1])
-
-    return count / total
-
-
-def fit_theta(n, k):
-    def ll(theta):
-        return -k * np.log(theta) + np.sum([np.log(theta + i) for i in range(n)])
-
-    result = opt.minimize_scalar(ll, bounds=(0, 1e7), method="bounded")
-
-    return result.x
-
-
 if Path("./data/figure_2.csv").exists():
     print("using existing dataframe for figure 2")
     ps = pd.read_csv("./data/figure_2.csv")
 else:
     print("computing data for figure 2")
-    rows = []
 
-    for i in tqdm(list(range(44, popes.shape[0] + 1))):
+    random.seed(231)
+    args = [(i, random.randint(0, 2**16)) for i in range(44, popes.shape[0] + 1)]
+
+    def run(i, seed):
         d = popes.iloc[:i, :]
 
         year = d["start"].iloc[-1]
@@ -234,34 +216,39 @@ else:
 
         configuration = " ".join([str(x) for x in d["name"].value_counts()])
 
-        p_tail = run_test(n, k, configuration, samples=SAMPLES)
-        theta = fit_theta(n, k)
+        cmd = f"ewinfer -j --seed {seed} -s {int(SAMPLES)} --test '{configuration}'"
+        ans = json.loads(sbp.getoutput(cmd))
 
-        rows.append(
-            {
-                "year": year,
-                "pope": pope,
-                "n": n,
-                "k": k,
-                "p_tail": p_tail,
-                "theta": theta,
-            }
+        return {
+            "year": year,
+            "pope": pope,
+            "n": n,
+            "k": k,
+            "p_tail": [x for x in ans["tests"] if x["test"] == "slatkin"][0]["p_tail"],
+            "theta": ans["theta"],
+        }
+
+    rows = list(
+        tqdm(
+            Parallel(n_jobs=20, return_as="generator")(delayed(run)(*x) for x in args),
+            total=len(args),
         )
+    )
 
     ps = pd.DataFrame.from_records(rows)
     ps.to_csv("./data/figure_2.csv")
 
-fig, axs = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True, sharex=True)
+fig, axs = plt.subplots(1, 2, figsize=(7, 3), constrained_layout=True, sharex=True)
 colors = sns.xkcd_palette(["slate blue", "teal green"])
 
 sns.lineplot(ps, x="year", y="p_tail", ax=axs[0], color=colors[0])
 
 axs[0].set_xlabel("Year")
-axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability")
+axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability", fontsize="small")
 
 axs[0].axhline(1, color="gray", linestyle="--")
-axs[0].axhline(0.05, color="red")
-# axs[0].axhline(0.95, color="red",alpha=0.3)
+axs[0].axhline(0.025, color="red", alpha=0.6)
+axs[0].axhline(0.975, color="red", alpha=0.6)
 axs[0].set_ylim(0, 1.1)
 
 sns.lineplot(ps, x="year", y="theta", ax=axs[1], color=colors[1])
@@ -298,32 +285,6 @@ fig.savefig("figures/figure_2.png", dpi=600, bbox_inches="tight")
 # make figure 3
 
 
-def run_test_conditional(n, k, configuration, initial_configuration, samples=1e8):
-    seed = random.randint(0, 2**16)
-    cmd = f"ewens-sampler sample --seed {seed} -n {n} -k {k} --initial-configuration '{initial_configuration}' {int(samples)} | ewens-sampler test '{configuration}'"
-
-    result = sbp.getoutput(cmd).split()
-    count, total = int(result[0]), int(result[1])
-
-    return count / total
-
-
-def fit_theta_conditional(n, k, n0, k0):
-    if k == k0:
-        # return 0 as no mutations => theta = 4Nmu = 0
-        return 0
-    else:
-
-        def ll(theta):
-            return -(k - k0) * np.log(theta) + np.sum(
-                [np.log(theta + i) for i in range(n0, n)]
-            )
-
-        result = opt.minimize_scalar(ll, bounds=(0, 1e7), method="bounded")
-
-        return result.x
-
-
 def get_windows(size):
     x = np.arange(432, 2025 - size + 1)
     return zip(x, x + size)
@@ -338,9 +299,11 @@ if Path("./data/figure_3.csv").exists():
 else:
     print("computing data for figure 3")
 
-    rows = []
+    random.seed(232)
 
-    for s, e in tqdm(list(get_windows(size))):
+    args = [(s, e, random.randint(0, 2**16)) for s, e in get_windows(size)]
+
+    def run(s, e, seed):
         d = popes.query("start <= @s")
 
         year = d["start"].iloc[-1]
@@ -354,11 +317,9 @@ else:
         n = d_end.shape[0]
         k = len(d_end["name"].unique())
 
-        p_tail = run_test_conditional(
-            n, k, end_configuration, initial_configuration, SAMPLES
-        )
+        cmd = f"ewinfer -j --seed {seed} -s {int(SAMPLES)} --initial-configuration '{initial_configuration}' --test '{end_configuration}'"
 
-        theta = fit_theta_conditional(n, k, n0, k0)
+        ans = json.loads(sbp.getoutput(cmd))
 
         d_win = popes.query("start >= @s and start < @e")
         k_win = len(d_win["name"].unique())
@@ -368,33 +329,37 @@ else:
         win_freqs = (win_counts / win_counts.sum()).values
         win_entropy = -(win_freqs * np.log(win_freqs)).sum()
 
-        rows.append(
-            {
-                "year": year,
-                "pope": pope,
-                "n": n,
-                "k": k,
-                "window_start": s,
-                "window_end": e,
-                "window_size": size,
-                "n0": n0,
-                "k0": k0,
-                "n_win": n_win,
-                "k_win": k_win,
-                "win_entropy": win_entropy,
-                "theta": theta,
-                "p_tail": p_tail,
-            }
+        return {
+            "year": year,
+            "pope": pope,
+            "n": n,
+            "k": k,
+            "window_start": s,
+            "window_end": e,
+            "window_size": size,
+            "n0": n0,
+            "k0": k0,
+            "n_win": n_win,
+            "k_win": k_win,
+            "win_entropy": win_entropy,
+            "theta": ans["theta"],
+            "p_tail": [x for x in ans["tests"] if x["test"] == "slatkin"][0]["p_tail"],
+        }
+
+    rows = list(
+        tqdm(
+            Parallel(n_jobs=20, return_as="generator")(delayed(run)(*x) for x in args),
+            total=len(args),
         )
+    )
 
     ps_windowed = pd.DataFrame.from_records(rows)
     ps_windowed.to_csv("./data/figure_3.csv")
 
-
 fig, axs = plt.subplots(
     1,
     3,
-    figsize=(12, 4),
+    figsize=(12, 3),
     constrained_layout=True,
     sharex=True,
     gridspec_kw={"wspace": 0.1},
@@ -406,10 +371,11 @@ dplot = ps_windowed.query(f"window_size == @size")
 sns.lineplot(dplot, x="window_end", y="p_tail", ax=axs[0], color=colors[0])
 
 axs[0].set_xlabel("Year")
-axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability")
+axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability", fontsize="small")
 
 axs[0].axhline(1, color="gray", linestyle="--")
-axs[0].axhline(0.05, color="red")
+axs[0].axhline(0.025, color="red", alpha=0.6)
+axs[0].axhline(0.975, color="red", alpha=0.6)
 axs[0].set_ylim(0, 1.1)
 
 sns.lineplot(dplot, x="window_end", y="theta", ax=axs[1], color=colors[1])
