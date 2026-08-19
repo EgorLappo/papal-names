@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from joblib import delayed, Parallel
 
+SAMPLES = 1e7
+
 
 def run_test_conditional(
     n,
@@ -17,7 +19,7 @@ def run_test_conditional(
     configuration,
     initial_configuration=None,
     bias=1.0,
-    samples=1e8,
+    samples=1e7,
     seed=234,
 ):
     if bias == 1.0:
@@ -62,7 +64,7 @@ def run(popes, s, size):
             k,
             end_configuration,
             initial_configuration,
-            samples=100000,
+            samples=SAMPLES,
             bias=bias,
             seed=int(n + k + bias * 1000),
         )
@@ -71,7 +73,7 @@ def run(popes, s, size):
             k,
             end_configuration,
             initial_configuration=None,
-            samples=100000,
+            samples=SAMPLES,
             bias=bias,
             seed=int(n + k + bias * 1000),
         )
