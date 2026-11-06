@@ -30,11 +30,12 @@ def run_test_conditional(
     else:
         icstr = f"--initial-configuration '{initial_configuration}' "
 
-    cmd = f"ewinfer -j --seed {seed} {bstr}{icstr}-s {int(samples)} --test '{configuration}'"
+    cmd = f"ewens-sampler -q -j --seed {seed} {bstr}{icstr}-s {int(samples)} --test '{configuration}'"
 
     ans = json.loads(sbp.getoutput(cmd))
 
-    return [x for x in ans["tests"] if x["test"] == "slatkin"][0]["p_tail"]
+    s = next(x for x in ans["tests"] if x["test"] == "slatkin")
+    return s["p_lower"], s["p_upper"]
 
 
 def sample_configurations(
@@ -50,7 +51,7 @@ def sample_configurations(
     else:
         icstr = f"--initial-configuration '{initial_configuration}' "
 
-    cmd = f"ewinfer -n {n} -k {k} --seed {seed} {bstr}{icstr}-s {int(samples)}"
+    cmd = f"ewens-sampler -q -n {n} -k {k} --seed {seed} {bstr}{icstr}-s {int(samples)}"
 
     s = sbp.getoutput(cmd).split("\n")
     return s
@@ -68,7 +69,7 @@ def run_power(d, samples=1_000, test_samples=10_000):
                 n, k, bias=bias, samples=samples, seed=int(n + k + (bias + 9) * 1000)
             )
         ):
-            p_tail = run_test_conditional(
+            p_lower, p_upper = run_test_conditional(
                 n,
                 k,
                 tc,
@@ -83,7 +84,8 @@ def run_power(d, samples=1_000, test_samples=10_000):
                     "k": k,
                     "bias": bias,
                     "rep": i,
-                    "p_tail": p_tail,
+                    "p_lower": p_lower,
+                    "p_upper": p_upper,
                 }
             )
     return pd.DataFrame.from_records(rows)
@@ -116,7 +118,7 @@ def run_power_windows(popes, s, size, samples=1_000, test_samples=10_000):
                 seed=int(n + k + bias * 1000 + 2),
             )
         ):
-            p_tail = run_test_conditional(
+            p_lower, p_upper = run_test_conditional(
                 n,
                 k,
                 tc,
@@ -137,14 +139,30 @@ def run_power_windows(popes, s, size, samples=1_000, test_samples=10_000):
                     "k0": k0,
                     "bias": bias,
                     "rep": i,
-                    "p_tail": p_tail,
+                    "p_lower": p_lower,
+                    "p_upper": p_upper,
                 }
             )
     return pd.DataFrame.from_records(rows)
 
 
-def twotail(x, alpha=0.05):
-    return x[(x < alpha / 2) | (x > (1 - alpha / 2))].shape[0]
+def rejections(df, keys, alpha=0.05):
+    # two-sided test with ties counted in both tails: reject when either tail p-value is below alpha / 2
+    df = df.assign(
+        reject_lower=df["p_lower"] < alpha / 2,
+        reject_upper=df["p_upper"] < alpha / 2,
+    )
+    df["reject"] = df["reject_lower"] | df["reject_upper"]
+    return (
+        df.groupby(keys)
+        .agg(
+            total=("reject", "size"),
+            twotail=("reject", "mean"),
+            lower=("reject_lower", "mean"),
+            upper=("reject_upper", "mean"),
+        )
+        .reset_index()
+    )
 
 
 popes = pd.read_csv("popes-list.csv")
@@ -169,22 +187,7 @@ else:
     power_df = pd.concat(results)
     power_df.to_csv("./data/figure_s1a.csv", index=False)
 
-power_df = (
-    power_df.groupby(["year", "pope", "n", "k", "bias"])
-    .agg({"p_tail": ["count", twotail]})
-    .reset_index()
-)
-power_df.columns = [
-    "year",
-    "pope",
-    "n",
-    "k",
-    "bias",
-    "total",
-    "twotail",
-]
-
-power_df["twotail"] = power_df["twotail"] / power_df["total"]
+power_df = rejections(power_df, ["year", "pope", "n", "k", "bias"])
 power_df["bias"] = power_df["bias"].astype(str)
 
 ## compute panel B
@@ -207,26 +210,9 @@ else:
     power_windf = pd.concat(results)
     power_windf.to_csv("./data/figure_s1b.csv", index=False)
 
-power_windf = (
-    power_windf.groupby(
-        ["year", "pope", "n", "k", "window_start", "window_end", "bias"]
-    )
-    .agg({"p_tail": ["count", twotail]})
-    .reset_index()
+power_windf = rejections(
+    power_windf, ["year", "pope", "n", "k", "window_start", "window_end", "bias"]
 )
-power_windf.columns = [
-    "year",
-    "pope",
-    "n",
-    "k",
-    "window_start",
-    "window_end",
-    "bias",
-    "total",
-    "twotail",
-]
-
-power_windf["twotail"] = power_windf["twotail"] / power_windf["total"]
 power_windf["bias"] = power_windf["bias"].astype(str)
 
 # now we have power_df and power_windf

@@ -28,11 +28,12 @@ def run_test_conditional(
     else:
         icstr = f"--initial-configuration '{initial_configuration}' "
 
-    cmd = f"./ewinfer -j --seed {seed} {bstr}{icstr}-s {int(samples)} --test '{configuration}'"
+    cmd = f"./ewens-sampler -q -j --seed {seed} {bstr}{icstr}-s {int(samples)} --test '{configuration}'"
 
     ans = json.loads(sbp.getoutput(cmd))
 
-    return [x for x in ans["tests"] if x["test"] == "slatkin"][0]["p_tail"]
+    s = next(x for x in ans["tests"] if x["test"] == "slatkin")
+    return s["p_lower"], s["p_upper"]
 
 
 def sample_configurations(
@@ -48,7 +49,7 @@ def sample_configurations(
     else:
         icstr = f"--initial-configuration '{initial_configuration}' "
 
-    cmd = f"./ewinfer -n {n} -k {k} --seed {seed} {bstr}{icstr}-s {int(samples)}"
+    cmd = f"./ewens-sampler -q -n {n} -k {k} --seed {seed} {bstr}{icstr}-s {int(samples)}"
 
     s = sbp.getoutput(cmd).split("\n")
     return s
@@ -66,7 +67,7 @@ def run_power(d, samples=1_000, test_samples=10_000):
                 n, k, bias=bias, samples=samples, seed=int(n + k + (bias + 9) * 1000)
             )
         ):
-            p_tail = run_test_conditional(
+            p_lower, p_upper = run_test_conditional(
                 n,
                 k,
                 tc,
@@ -81,7 +82,8 @@ def run_power(d, samples=1_000, test_samples=10_000):
                     "k": k,
                     "bias": bias,
                     "rep": i,
-                    "p_tail": p_tail,
+                    "p_lower": p_lower,
+                    "p_upper": p_upper,
                 }
             )
     return pd.DataFrame.from_records(rows)
@@ -114,7 +116,7 @@ def run_power_windows(popes, s, size, samples=1_000, test_samples=10_000):
                 seed=int(n + k + bias * 1000 + 2),
             )
         ):
-            p_tail = run_test_conditional(
+            p_lower, p_upper = run_test_conditional(
                 n,
                 k,
                 tc,
@@ -135,15 +137,11 @@ def run_power_windows(popes, s, size, samples=1_000, test_samples=10_000):
                     "k0": k0,
                     "bias": bias,
                     "rep": i,
-                    "p_tail": p_tail,
+                    "p_lower": p_lower,
+                    "p_upper": p_upper,
                 }
             )
     return pd.DataFrame.from_records(rows)
-
-
-def twotail(x, alpha=0.05):
-    return x[(x < alpha / 2) | (x > (1 - alpha / 2))].shape[0]
-
 
 popes = pd.read_csv("popes-list.csv")
 

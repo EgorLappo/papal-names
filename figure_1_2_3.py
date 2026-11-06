@@ -11,13 +11,17 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import seaborn as sns
 from tqdm import tqdm
+from joblib import Parallel, delayed
 
-SAMPLES = 1e7
+SAMPLES = 1e6
 
 random.seed(231)
 
 popes = pd.read_csv("popes-list.csv")
 
+def slatkin_tails(ans):
+    s = next(x for x in ans["tests"] if x["test"] == "slatkin")
+    return {"p_lower": s["p_lower"], "p_upper": s["p_upper"]}
 
 # make figure 1
 
@@ -216,17 +220,20 @@ else:
 
         configuration = " ".join([str(x) for x in d["name"].value_counts()])
 
-        cmd = f"ewinfer -j --seed {seed} -s {int(SAMPLES)} --test '{configuration}'"
+        cmd = f"ewens-sampler -j --seed {seed} -s {int(SAMPLES)} --test '{configuration}'"
         ans = json.loads(sbp.getoutput(cmd))
 
-        return {
+        result = {
             "year": year,
             "pope": pope,
             "n": n,
             "k": k,
-            "p_tail": [x for x in ans["tests"] if x["test"] == "slatkin"][0]["p_tail"],
             "theta": ans["theta"],
         }
+
+        result.update(slatkin_tails(ans))
+
+        return result
 
     rows = list(
         tqdm(
@@ -241,7 +248,9 @@ else:
 fig, axs = plt.subplots(1, 2, figsize=(7, 3), constrained_layout=True, sharex=True)
 colors = sns.xkcd_palette(["slate blue", "teal green"])
 
-sns.lineplot(ps, x="year", y="p_tail", ax=axs[0], color=colors[0])
+# sns.lineplot(ps, x="year", y="p_tail", ax=axs[0], color=colors[0])
+axs[0].fill_between(ps["year"], 1 - ps["p_upper"], ps["p_lower"],
+                color=colors[0], alpha=0.5, linewidth=0.8, edgecolor=colors[0])
 
 axs[0].set_xlabel("Year")
 axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability", fontsize="small")
@@ -317,7 +326,7 @@ else:
         n = d_end.shape[0]
         k = len(d_end["name"].unique())
 
-        cmd = f"ewinfer -j --seed {seed} -s {int(SAMPLES)} --initial-configuration '{initial_configuration}' --test '{end_configuration}'"
+        cmd = f"ewens-sampler -j --seed {seed} -s {int(SAMPLES)} --initial-configuration '{initial_configuration}' --test '{end_configuration}'"
 
         ans = json.loads(sbp.getoutput(cmd))
 
@@ -329,7 +338,7 @@ else:
         win_freqs = (win_counts / win_counts.sum()).values
         win_entropy = -(win_freqs * np.log(win_freqs)).sum()
 
-        return {
+        result = {
             "year": year,
             "pope": pope,
             "n": n,
@@ -343,8 +352,9 @@ else:
             "k_win": k_win,
             "win_entropy": win_entropy,
             "theta": ans["theta"],
-            "p_tail": [x for x in ans["tests"] if x["test"] == "slatkin"][0]["p_tail"],
         }
+        result.update(slatkin_tails(ans))
+        return result
 
     rows = list(
         tqdm(
@@ -368,7 +378,9 @@ colors = sns.xkcd_palette(["slate blue", "teal green", "rust red"])
 
 dplot = ps_windowed.query(f"window_size == @size")
 
-sns.lineplot(dplot, x="window_end", y="p_tail", ax=axs[0], color=colors[0])
+# sns.lineplot(dplot, x="window_end", y="p_tail", ax=axs[0], color=colors[0])
+axs[0].fill_between(dplot["window_end"], 1 - dplot["p_upper"], dplot["p_lower"],
+                color=colors[0], alpha=0.5, linewidth=0.8, edgecolor=colors[0])
 
 axs[0].set_xlabel("Year")
 axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability", fontsize="small")

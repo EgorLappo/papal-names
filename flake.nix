@@ -41,6 +41,7 @@
             matplotlib
             seaborn
             jupyter
+            sympy
           ]
         );
 
