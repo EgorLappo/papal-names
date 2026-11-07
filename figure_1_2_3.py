@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-from pathlib import Path
-import random
 import json
+import random
 import subprocess as sbp
-import pandas as pd
-import numpy as np
-import scipy.optimize as opt
+from pathlib import Path
+
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
+import numpy as np
+import pandas as pd
 import seaborn as sns
-from tqdm import tqdm
 from joblib import Parallel, delayed
+from matplotlib.ticker import MultipleLocator
+from tqdm import tqdm
 
 SAMPLES = 1e6
 
@@ -19,9 +19,11 @@ random.seed(231)
 
 popes = pd.read_csv("popes-list.csv")
 
+
 def slatkin_tails(ans):
     s = next(x for x in ans["tests"] if x["test"] == "slatkin")
     return {"p_lower": s["p_lower"], "p_upper": s["p_upper"]}
+
 
 # make figure 1
 
@@ -119,13 +121,13 @@ ax.annotate(
     "John",
     (21.2, 1958 - 50),
     (22, 1958 - 250),
-    arrowprops=dict(
-        arrowstyle="->",
-        connectionstyle="arc3,rad=-0.05",
-        color=colors[1],
-        shrinkA=0.1,
-        shrinkB=0.8,
-    ),
+    arrowprops={
+        "arrowstyle": "->",
+        "connectionstyle": "arc3,rad=-0.05",
+        "color": colors[1],
+        "shrinkA": 0.1,
+        "shrinkB": 0.8,
+    },
     va="baseline",
     ha="center",
     color=colors[1],
@@ -135,13 +137,13 @@ ax.annotate(
     "Gregory",
     (16.2, 1831 - 50),
     (17, 1831 - 250),
-    arrowprops=dict(
-        arrowstyle="->",
-        connectionstyle="arc3,rad=-0.05",
-        color=colors[1],
-        shrinkA=0.1,
-        shrinkB=0.8,
-    ),
+    arrowprops={
+        "arrowstyle": "->",
+        "connectionstyle": "arc3,rad=-0.05",
+        "color": colors[1],
+        "shrinkA": 0.1,
+        "shrinkB": 0.8,
+    },
     va="baseline",
     ha="center",
     color=colors[1],
@@ -151,13 +153,13 @@ ax.annotate(
     "Benedict",
     (15.2, 2005 + 33),
     (16, 2005 + 150),
-    arrowprops=dict(
-        arrowstyle="->",
-        connectionstyle="arc3,rad=-0.05",
-        color=colors[1],
-        shrinkA=0.1,
-        shrinkB=0.8,
-    ),
+    arrowprops={
+        "arrowstyle": "->",
+        "connectionstyle": "arc3,rad=-0.05",
+        "color": colors[1],
+        "shrinkA": 0.1,
+        "shrinkB": 0.8,
+    },
     va="baseline",
     ha="left",
     color=colors[1],
@@ -167,13 +169,13 @@ ax.annotate(
     "Leo",
     (13.8, 2025 + 33),
     (13, 2025 + 150),
-    arrowprops=dict(
-        arrowstyle="->",
-        connectionstyle="arc3,rad=-0.05",
-        color=colors[1],
-        shrinkA=0.1,
-        shrinkB=0.8,
-    ),
+    arrowprops={
+        "arrowstyle": "->",
+        "connectionstyle": "arc3,rad=-0.05",
+        "color": colors[1],
+        "shrinkA": 0.1,
+        "shrinkB": 0.8,
+    },
     va="baseline",
     ha="right",
     color=colors[1],
@@ -183,13 +185,13 @@ ax.annotate(
     "Pius",
     (11.8, 1939 + 33),
     (11, 1939 + 150),
-    arrowprops=dict(
-        arrowstyle="->",
-        connectionstyle="arc3,rad=-0.05",
-        color=colors[1],
-        shrinkA=0.1,
-        shrinkB=0.8,
-    ),
+    arrowprops={
+        "arrowstyle": "->",
+        "connectionstyle": "arc3,rad=-0.05",
+        "color": colors[1],
+        "shrinkA": 0.1,
+        "shrinkB": 0.8,
+    },
     va="baseline",
     ha="right",
     color=colors[1],
@@ -220,7 +222,9 @@ else:
 
         configuration = " ".join([str(x) for x in d["name"].value_counts()])
 
-        cmd = f"ewens-sampler -j --seed {seed} -s {int(SAMPLES)} --test '{configuration}'"
+        cmd = (
+            f"ewens-sampler -j --seed {seed} -s {int(SAMPLES)} --test '{configuration}'"
+        )
         ans = json.loads(sbp.getoutput(cmd))
 
         result = {
@@ -249,8 +253,17 @@ fig, axs = plt.subplots(1, 2, figsize=(7, 3), constrained_layout=True, sharex=Tr
 colors = sns.xkcd_palette(["slate blue", "teal green"])
 
 # sns.lineplot(ps, x="year", y="p_tail", ax=axs[0], color=colors[0])
-axs[0].fill_between(ps["year"], 1 - ps["p_upper"], ps["p_lower"],
-                color=colors[0], alpha=0.5, linewidth=0.8, edgecolor=colors[0])
+axs[0].fill_between(
+    ps["year"],
+    1 - ps["p_upper"],
+    ps["p_lower"],
+    color=colors[0],
+    alpha=0.5,
+    linewidth=0.8,
+    edgecolor=colors[0],
+)
+axs[0].plot(ps["year"], ps["p_lower"], color=colors[0])
+axs[0].plot(ps["year"], 1 - ps["p_upper"], color=colors[0])
 
 axs[0].set_xlabel("Year")
 axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability", fontsize="small")
@@ -376,11 +389,20 @@ fig, axs = plt.subplots(
 )
 colors = sns.xkcd_palette(["slate blue", "teal green", "rust red"])
 
-dplot = ps_windowed.query(f"window_size == @size")
+dplot = ps_windowed.query("window_size == @size")
 
 # sns.lineplot(dplot, x="window_end", y="p_tail", ax=axs[0], color=colors[0])
-axs[0].fill_between(dplot["window_end"], 1 - dplot["p_upper"], dplot["p_lower"],
-                color=colors[0], alpha=0.5, linewidth=0.8, edgecolor=colors[0])
+axs[0].fill_between(
+    dplot["window_end"],
+    1 - dplot["p_upper"],
+    dplot["p_lower"],
+    color=colors[0],
+    alpha=0.5,
+    linewidth=0.8,
+    edgecolor=colors[0],
+)
+axs[0].plot(dplot["window_end"], dplot["p_lower"], color=colors[0])
+axs[0].plot(dplot["window_end"], 1 - dplot["p_upper"], color=colors[0])
 
 axs[0].set_xlabel("Year")
 axs[0].set_ylabel("$P_E$, Slatkin exact test tail probability", fontsize="small")
@@ -433,5 +455,5 @@ axs[2].text(
     ha="center",
 )
 
-fig.savefig(f"figures/figure_3.png", dpi=600, bbox_inches="tight")
-fig.savefig(f"figures/figure_3.pdf", bbox_inches="tight")
+fig.savefig("figures/figure_3.png", dpi=600, bbox_inches="tight")
+fig.savefig("figures/figure_3.pdf", bbox_inches="tight")
