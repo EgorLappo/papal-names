@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import json
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from tqdm.auto import tqdm
 import subprocess as sbp
-from joblib import delayed, Parallel
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from joblib import Parallel, delayed
+from tqdm.auto import tqdm
 
 
 def run_test_conditional(

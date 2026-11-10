@@ -1,4 +1,5 @@
-notebooks/output/
+_notebooks/
+notebooks/
 data/figure_s1a.csv
 data/figure_s1b.csv
 

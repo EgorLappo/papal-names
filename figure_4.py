@@ -1,26 +1,29 @@
 #!/usr/bin/env python
 
 import json
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from tqdm.auto import tqdm
 import subprocess as sbp
-import matplotlib.pyplot as plt
-import seaborn as sns
-from joblib import delayed, Parallel
+from pathlib import Path
 
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from joblib import Parallel, delayed
+from tqdm.auto import tqdm
+
+# fix the number of samples for all tests
 SAMPLES = 1e5
 
+# run a single conditional Slatkin test
 def run_test_conditional(
     n,
     k,
     configuration,
     initial_configuration=None,
     bias=1.0,
-    samples=1e7,
+    samples=SAMPLES,
     seed=234,
 ):
+    # build the call string for ewens-sampler
     if bias == 1.0:
         bstr = ""
     else:
@@ -34,28 +37,38 @@ def run_test_conditional(
     cmd = f"ewens-sampler -j --seed {seed} {bstr}{icstr}-s {int(samples)} --test '{configuration}'"
 
     out = sbp.getoutput(cmd)
-    # print(out)
 
+    # load output json and get the tail probabilities
     ans = json.loads(out)
 
     s = next(x for x in ans["tests"] if x["test"] == "slatkin")
     return s["p_lower"], s["p_upper"]
 
+# run all tests at all bias parameter values
+# for a single temporal window
 def run(popes, s, size):
+    # s is the start, e is the end of the window
     e = s + size
+
+    # get popes up to the beginning of the window
     d = popes.query("start <= @s")
 
+    # build initial frequency vector 
     year = d["start"].iloc[-1]
     pope = d["pope"].iloc[-1]
     initial_configuration = " ".join([str(x) for x in d["name"].value_counts()])
     n0 = d.shape[0]
     k0 = len(d["name"].unique())
 
+    # get popes up to the end of the window
     d_end = popes.query("start < @e")
+    # build end frequency vector
     end_configuration = " ".join([str(x) for x in d_end["name"].value_counts()])
     n = d_end.shape[0]
     k = len(d_end["name"].unique())
 
+    # for each bias value, run a full exact test and a
+    # conditional exact test
     rows = []
     for bias in [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.11, 1.25, 1.43, 1.67, 2]:
         p_tail_win_lo, p_tail_win_up = run_test_conditional(
@@ -96,20 +109,23 @@ def run(popes, s, size):
         )
     return pd.DataFrame.from_records(rows)
 
-
+# read data
 popes = pd.read_csv("popes-list.csv")
 
-
+# reuse cache if present, recompute otherwise
 if Path("./data/figure_4.csv").exists():
     print("using existing dataframe for figure 4")
     ps = pd.read_csv("./data/figure_4.csv")
 else:
+    # temporal window size
     size = 200
     inputs = []
 
+    # get all window start dates (for each pope)
     for s in popes.query("start >= 432 and start < 2025 - @size + 5")["start"]:
         inputs.append((popes, s, size))
 
+    # run all tests in parallel
     results = list(
         tqdm(
             Parallel(n_jobs=-1, return_as="generator")(
@@ -121,28 +137,27 @@ else:
     ps = pd.concat(results)
     ps.to_csv("./data/figure_4.csv")
 
-
+# plotting 
 fig, axs = plt.subplots(
     1, 2, figsize=(12, 4), layout="compressed", sharex=True, sharey=True
 )
 
 ax = axs[0]
 
-# sns.lineplot(
-#     ps,
-#     x="window_end",
-#     y="p_tail",
-#     hue="bias",
-#     ax=ax,
-#     palette=sns.color_palette("icefire", n_colors=11),
-#     legend=False,
-# )
 palette = sns.color_palette("icefire", n_colors=11)
 for color, (bias, d) in zip(palette, ps.groupby("bias")):
     d = d.sort_values("window_end")
-    ax.fill_between(d["window_end"], 1 - d["p_tail_upper"], d["p_tail_lower"],
-                    color=color, alpha=0.5, linewidth=0.8, edgecolor=color)
-
+    ax.fill_between(
+        d["window_end"],
+        1 - d["p_tail_upper"],
+        d["p_tail_lower"],
+        color=color,
+        alpha=1,
+        linewidth=0.8,
+        edgecolor=color,
+    )
+    ax.plot(d["window_end"], d["p_tail_lower"], color=color)
+    ax.plot(d["window_end"], 1 - d["p_tail_upper"], color=color)
 
 ax.set_xlabel("Year")
 ax.set_ylabel("$P_E$, Slatkin exact test tail probability")
@@ -150,7 +165,6 @@ ax.axhline(0.025, color="red", alpha=0.6)
 ax.axhline(0.975, color="red", alpha=0.6)
 ax.axhline(1, color="gray", linestyle="--")
 ax.axhline(0, color="gray", linestyle="--")
-# ax.set_title("Full configuration test")
 
 ax.text(
     -0.06,
@@ -165,19 +179,21 @@ ax.text(
 
 ax = axs[1]
 
-# sns.lineplot(
-#     ps,
-#     x="window_end",
-#     y="p_tail_win",
-#     hue="bias",
-#     ax=ax,
-#     palette=sns.color_palette("icefire", n_colors=11),
-#     legend=True,
-# )
 for color, (bias, d) in zip(palette, ps.groupby("bias")):
     d = d.sort_values("window_end")
-    ax.fill_between(d["window_end"], 1 - d["p_tail_win_upper"], d["p_tail_win_lower"],
-                    color=color, alpha=0.5, linewidth=0.8, edgecolor=color, label=f"{bias:g}")
+    ax.fill_between(
+        d["window_end"],
+        1 - d["p_tail_win_upper"],
+        d["p_tail_win_lower"],
+        color=color,
+        alpha=1,
+        linewidth=0.8,
+        edgecolor=color,
+        label=f"{bias:g}",
+    )
+
+    ax.plot(d["window_end"], d["p_tail_win_lower"], color=color)
+    ax.plot(d["window_end"], 1 - d["p_tail_win_upper"], color=color)
 
 ax.set_xlabel("Year")
 ax.set_ylabel("$P_E$, Slatkin exact test tail probability")
@@ -185,7 +201,6 @@ ax.axhline(0.025, color="red", alpha=0.6)
 ax.axhline(0.975, color="red", alpha=0.6)
 ax.axhline(1, color="gray", linestyle="--")
 ax.axhline(0, color="gray", linestyle="--")
-# ax.set_title("Windowed conditional test")
 
 ax.legend(title="$\\beta$", loc="upper left", bbox_to_anchor=(1, 1))
 

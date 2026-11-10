@@ -13,13 +13,17 @@ from joblib import Parallel, delayed
 from matplotlib.ticker import MultipleLocator
 from tqdm import tqdm
 
-SAMPLES = 1e6
+# fix the number of samples for all
+# Slatkin tests
+SAMPLES = 1e7
 
+# fix random seed
 random.seed(231)
 
+# read input data
 popes = pd.read_csv("popes-list.csv")
 
-
+# extract p-values from a test result json
 def slatkin_tails(ans):
     s = next(x for x in ans["tests"] if x["test"] == "slatkin")
     return {"p_lower": s["p_lower"], "p_upper": s["p_upper"]}
@@ -27,7 +31,7 @@ def slatkin_tails(ans):
 
 # make figure 1
 
-
+# count popes and names seen at each year
 rows = []
 for i in range(1, popes.shape[0] + 1):
     di = popes.iloc[:i, :]
@@ -38,7 +42,7 @@ for i in range(1, popes.shape[0] + 1):
 
 dc = pd.DataFrame.from_records(rows).sort_values(by="year")
 
-
+# count popes per name and the year name was last chosen
 rows = []
 for name in popes["name"].unique():
     dn = popes.query("name == @name")
@@ -203,25 +207,32 @@ fig.savefig("figures/figure_1.png", dpi=600, bbox_inches="tight")
 
 # make figure 2
 
+# try to use cached data or recompute from scratch
 if Path("./data/figure_2.csv").exists():
     print("using existing dataframe for figure 2")
     ps = pd.read_csv("./data/figure_2.csv")
 else:
     print("computing data for figure 2")
 
+    ## make a seed for each pope starting from 44th:
     random.seed(231)
     args = [(i, random.randint(0, 2**16)) for i in range(44, popes.shape[0] + 1)]
 
+    # run ewens sampler on the data up to pope number i
     def run(i, seed):
+        # subset popes
         d = popes.iloc[:i, :]
 
         year = d["start"].iloc[-1]
         pope = d["pope"].iloc[-1]
 
+        # get observed n (number of popes) and k (number of names)
         n, k = d.shape[0], len(d["name"].unique())
 
+        # build a frequency vector from value counts
         configuration = " ".join([str(x) for x in d["name"].value_counts()])
 
+        # run the test and read json output
         cmd = (
             f"ewens-sampler -j --seed {seed} -s {int(SAMPLES)} --test '{configuration}'"
         )
@@ -235,10 +246,12 @@ else:
             "theta": ans["theta"],
         }
 
+        # add p_values from the results
         result.update(slatkin_tails(ans))
 
         return result
 
+    # run in parallel on data up to each pope
     rows = list(
         tqdm(
             Parallel(n_jobs=20, return_as="generator")(delayed(run)(*x) for x in args),
@@ -246,13 +259,14 @@ else:
         )
     )
 
+    # aggregate and cache result
     ps = pd.DataFrame.from_records(rows)
     ps.to_csv("./data/figure_2.csv")
 
+# plot p-values and inferred theta 
 fig, axs = plt.subplots(1, 2, figsize=(7, 3), constrained_layout=True, sharex=True)
 colors = sns.xkcd_palette(["slate blue", "teal green"])
 
-# sns.lineplot(ps, x="year", y="p_tail", ax=axs[0], color=colors[0])
 axs[0].fill_between(
     ps["year"],
     1 - ps["p_upper"],
@@ -315,34 +329,42 @@ def get_windows(size):
 # size of the temporal window
 size = 200
 
+# try to use cached data or recompute from scratch
 if Path("./data/figure_3.csv").exists():
     print("using existing dataframe for figure 3")
     ps_windowed = pd.read_csv("./data/figure_3.csv")
 else:
     print("computing data for figure 3")
 
+    # fix the seed for each temporal window
     random.seed(232)
-
     args = [(s, e, random.randint(0, 2**16)) for s, e in get_windows(size)]
 
+    # run slatkin's test for each window
     def run(s, e, seed):
+        # subset to popes at the beginning of the window
         d = popes.query("start <= @s")
 
+        # get n0, k0, initial frequency vector for the window
         year = d["start"].iloc[-1]
         pope = d["pope"].iloc[-1]
         initial_configuration = " ".join([str(x) for x in d["name"].value_counts()])
         n0 = d.shape[0]
         k0 = len(d["name"].unique())
 
+        # subset to popes at the end of the window
         d_end = popes.query("start < @e")
+        # get n, k, final frequency window
         end_configuration = " ".join([str(x) for x in d_end["name"].value_counts()])
         n = d_end.shape[0]
         k = len(d_end["name"].unique())
 
+        # run conditional Slatkin test on the window
         cmd = f"ewens-sampler -j --seed {seed} -s {int(SAMPLES)} --initial-configuration '{initial_configuration}' --test '{end_configuration}'"
 
         ans = json.loads(sbp.getoutput(cmd))
 
+        # get popes inside the window
         d_win = popes.query("start >= @s and start < @e")
         k_win = len(d_win["name"].unique())
         n_win = d_win.shape[0]
@@ -369,6 +391,7 @@ else:
         result.update(slatkin_tails(ans))
         return result
 
+    # run over all windows in Parallel
     rows = list(
         tqdm(
             Parallel(n_jobs=20, return_as="generator")(delayed(run)(*x) for x in args),
@@ -376,9 +399,11 @@ else:
         )
     )
 
+    # aggregate and save to cache
     ps_windowed = pd.DataFrame.from_records(rows)
     ps_windowed.to_csv("./data/figure_3.csv")
 
+# plot
 fig, axs = plt.subplots(
     1,
     3,
@@ -391,7 +416,6 @@ colors = sns.xkcd_palette(["slate blue", "teal green", "rust red"])
 
 dplot = ps_windowed.query("window_size == @size")
 
-# sns.lineplot(dplot, x="window_end", y="p_tail", ax=axs[0], color=colors[0])
 axs[0].fill_between(
     dplot["window_end"],
     1 - dplot["p_upper"],

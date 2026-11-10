@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
 import json
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from tqdm.auto import tqdm
 import subprocess as sbp
-from joblib import delayed, Parallel
+from pathlib import Path
+
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
+from joblib import Parallel, delayed
+from tqdm.auto import tqdm
 
 
+# run a single (full or conditional) exact test
 def run_test_conditional(
     n,
     k,
@@ -20,6 +21,7 @@ def run_test_conditional(
     samples=1e7,
     seed=234,
 ):
+    # build the call string
     if bias == 1.0:
         bstr = ""
     else:
@@ -34,10 +36,12 @@ def run_test_conditional(
 
     ans = json.loads(sbp.getoutput(cmd))
 
+    # return tail probabilities
     s = next(x for x in ans["tests"] if x["test"] == "slatkin")
     return s["p_lower"], s["p_upper"]
 
 
+# sample configurations under the biased chinese restaurant process
 def sample_configurations(
     n, k, initial_configuration=None, bias=1.0, samples=100, seed=231
 ):
@@ -57,18 +61,24 @@ def sample_configurations(
     return s
 
 
+# power calculation for the exact test
 def run_power(d, samples=1_000, test_samples=10_000):
     year = d["start"].iloc[-1]
     pope = d["pope"].iloc[-1]
 
+    # get observed values of n and k
     n, k = d.shape[0], len(d["name"].unique())
+
+    # for each value of bias
     rows = []
     for bias in [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.11, 1.25, 1.43, 1.67, 2]:
+        # first sample frequency vectors under the alternative model
         for i, tc in enumerate(
             sample_configurations(
                 n, k, bias=bias, samples=samples, seed=int(n + k + (bias + 9) * 1000)
             )
         ):
+            # and test for the null model
             p_lower, p_upper = run_test_conditional(
                 n,
                 k,
@@ -76,6 +86,7 @@ def run_power(d, samples=1_000, test_samples=10_000):
                 samples=test_samples,
                 seed=int(n + k + (bias + 10) * 1000),
             )
+
             rows.append(
                 {
                     "year": year,
@@ -88,24 +99,30 @@ def run_power(d, samples=1_000, test_samples=10_000):
                     "p_upper": p_upper,
                 }
             )
+
     return pd.DataFrame.from_records(rows)
 
 
+# same power calculation but for the conditional test in temporal windows
 def run_power_windows(popes, s, size, samples=1_000, test_samples=10_000):
     e = s + size
     d = popes.query("start <= @s")
 
+    # get observed n0, k0, initial frequency vector
     year = d["start"].iloc[-1]
     pope = d["pope"].iloc[-1]
     initial_configuration = " ".join([str(x) for x in d["name"].value_counts()])
     n0 = d.shape[0]
     k0 = len(d["name"].unique())
 
+    # and a final n and k at window end
     d_end = popes.query("start < @e")
     end_configuration = " ".join([str(x) for x in d_end["name"].value_counts()])
     n = d_end.shape[0]
     k = len(d_end["name"].unique())
 
+    # for each bias value, first sample a frequency vector
+    # completing the initial one under the alternative model
     rows = []
     for bias in [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.11, 1.25, 1.43, 1.67, 2]:
         for i, tc in enumerate(
@@ -118,6 +135,7 @@ def run_power_windows(popes, s, size, samples=1_000, test_samples=10_000):
                 seed=int(n + k + bias * 1000 + 2),
             )
         ):
+            # then test for the null
             p_lower, p_upper = run_test_conditional(
                 n,
                 k,
@@ -146,8 +164,9 @@ def run_power_windows(popes, s, size, samples=1_000, test_samples=10_000):
     return pd.DataFrame.from_records(rows)
 
 
+# given simulation results, add the two tail probabilities
+# to get fraction of rejections
 def rejections(df, keys, alpha=0.05):
-    # two-sided test with ties counted in both tails: reject when either tail p-value is below alpha / 2
     df = df.assign(
         reject_lower=df["p_lower"] < alpha / 2,
         reject_upper=df["p_upper"] < alpha / 2,
@@ -165,6 +184,7 @@ def rejections(df, keys, alpha=0.05):
     )
 
 
+# read data
 popes = pd.read_csv("popes-list.csv")
 
 
