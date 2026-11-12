@@ -62,7 +62,7 @@ DATA & FILE OVERVIEW
 
 METHODOLOGICAL INFORMATION:
 
-1. Description of methods used for collection/generation of data: see [arxiv preprint](https://arxiv.org/abs/2605.07028]) above.
+1. Description of methods used for collection/generation of data: Data was collected from freely available sources. For details, see [arxiv preprint](https://arxiv.org/abs/2605.07028]) above.
 
 2. Methods for processing the data: Python scripts described above were used to process and analyze tha data. 
 
@@ -74,7 +74,7 @@ DATA-SPECIFIC INFORMATION FOR:
 
 1. Number of variables: 3
 
-2. Number of cases/rows: 266
+2. Number of cases/rows: 265
 
 3. Variable List:
 
